@@ -1,6 +1,9 @@
+'use client'
+import { useRouter } from "next/navigation";
 import React from "react";
 
 export default function Hero_section() {
+  const router = useRouter();
   return (
     <>
       <div>
@@ -20,7 +23,7 @@ export default function Hero_section() {
                 perferendis inventore nisi porro recusandae nemo!
               </div>
               <div className="mt-8 flex flex-wrap gap-4 justify-center lg:justify-start">
-                <button className="bg-blue-700 text-white font-bold px-5 rounded-md text-sm hover:bg-blue-500 duration-300 h-12 w-40">
+                <button onClick={()=>{router.push('/contact')}} className="bg-blue-700 text-white font-bold px-5 rounded-md text-sm hover:bg-blue-500 duration-300 h-12 w-40">
                   CONTACT NOW
                 </button>
                 <button className="text-blue-700 font-bold border-2 border-blue-700 px-5 rounded-md text-sm hover:bg-blue-700 hover:text-white duration-300 h-12 w-36">
