@@ -6,7 +6,7 @@ export default function Header() {
       {/* Disclaimer */}
       <div className="h-auto bg-blue-400 flex flex-wrap items-center justify-center px-4 py-2 text-center gap-2 sm:gap-3">
         <div className="text-white font-medium text-xs sm:text-sm md:text-base text-center">
-          Get the latest information from us about COVID-19
+          Get the latest information from us about NCDs
         </div>
         <button className="border-2 border-white text-white px-3 sm:px-4 rounded-md text-xs sm:text-sm">
           <a href="https://www.google.com">Learn More</a>
@@ -25,7 +25,7 @@ export default function Header() {
             <img src="/mail.png" alt="" className="w-4 h-4 sm:w-5 sm:h-5 mr-1" /> care.[hospitalname]@gmail.com
           </div>
           <div className="hidden lg:flex items-center text-xs sm:text-sm font-medium text-black cursor-pointer hover:text-blue-400 duration-300">
-            <img src="/location.png" alt="" className="w-4 h-4 sm:w-5 sm:h-5 mr-1" /> Rock Street, San Francisco, California
+            <img src="/location.png" alt="" className="w-4 h-4 sm:w-5 sm:h-5 mr-1" /> Mohali, Punjab 
           </div>
         </div>
 
