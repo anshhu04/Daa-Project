@@ -15,6 +15,14 @@ const createTransporter = () => {
 };
 
 /**
+ * Generate a random confirmation code
+ */
+const generateConfirmationCode = () => {
+  // Generate a 6-digit confirmation code
+  return Math.floor(100000 + Math.random() * 900000).toString();
+};
+
+/**
  * Send confirmation email to patient
  */
 export async function sendPatientConfirmation(data) {
@@ -25,6 +33,9 @@ export async function sendPatientConfirmation(data) {
   if (!email) {
     throw new Error("Patient email address is missing");
   }
+  
+  // Generate a confirmation code for the patient
+  const confirmationCode = generateConfirmationCode();
   
   // Format the date for email
   const formattedDate = new Date(appointmentDate).toLocaleString('en-US', {
@@ -50,7 +61,9 @@ export async function sendPatientConfirmation(data) {
           <li><strong>Doctor:</strong> ${doctor}</li>
           <li><strong>Date and Time:</strong> ${formattedDate}</li>
           <li><strong>Appointment ID:</strong> ${appointmentId}</li>
+          <li><strong>Confirmation Code:</strong> ${confirmationCode}</li>
         </ul>
+        <p>Please keep your confirmation code. You may be asked to provide this code when you arrive for your appointment.</p>
         <p>Please arrive 15 minutes before your scheduled appointment time.</p>
         <p>If you need to reschedule or cancel your appointment, please contact us at least 24 hours in advance.</p>
         <p>Best regards,<br>Medical Center Team</p>
@@ -65,7 +78,9 @@ export async function sendPatientConfirmation(data) {
     // Send the email
     const info = await transporter.sendMail(mailOptions);
     console.log(`Patient email sent: ${info.messageId}`);
-    return info;
+    
+    // Return both the email info and confirmation code so it can be saved if needed
+    return { info, confirmationCode };
   } catch (error) {
     console.error("Error sending patient email:", error);
     throw error;

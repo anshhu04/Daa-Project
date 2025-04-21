@@ -7,9 +7,11 @@ import Appointment from '@/app/models/Appointment';
 import * as realEmailService from '@/app/lib/emailService';
 import * as mockEmailService from '@/app/lib/mockEmailService';
 
-// Determine which email service to use based on environment
-const isDev = process.env.NODE_ENV === 'development';
-const emailService = isDev ? mockEmailService : realEmailService;
+// Use real email service regardless of environment
+// Comment out the conditional to use real email service every time
+// const isDev = process.env.NODE_ENV === 'development';
+// const emailService = isDev ? mockEmailService : realEmailService;
+const emailService = realEmailService;
 
 export async function POST(request) {
   try {
@@ -46,11 +48,21 @@ export async function POST(request) {
     
     // Try to send emails but don't let failures stop the process
     let emailStatus = { patient: false, admin: false };
+    let confirmationCode = null;
     
     try {
       // Send confirmation email to patient
-      await emailService.sendPatientConfirmation(emailData);
+      const result = await emailService.sendPatientConfirmation(emailData);
       emailStatus.patient = true;
+      
+      // If we have a confirmation code, save it to the appointment
+      if (result && result.confirmationCode) {
+        confirmationCode = result.confirmationCode;
+        
+        // Update the appointment with the confirmation code
+        savedAppointment.confirmationCode = confirmationCode;
+        await savedAppointment.save();
+      }
     } catch (emailError) {
       console.error("Failed to send patient confirmation email:", emailError);
       // Continue with the process despite email failure
@@ -71,7 +83,8 @@ export async function POST(request) {
       message: 'Appointment scheduled successfully',
       appointmentId: savedAppointment._id,
       emailSent: emailStatus.patient,
-      adminNotified: emailStatus.admin
+      adminNotified: emailStatus.admin,
+      confirmationCode: confirmationCode // Include the confirmation code in the response
     });
     
   } catch (error) {

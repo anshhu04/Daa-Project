@@ -4,10 +4,21 @@
  */
 
 /**
+ * Generate a random confirmation code
+ */
+const generateConfirmationCode = () => {
+  // Generate a 6-digit confirmation code
+  return Math.floor(100000 + Math.random() * 900000).toString();
+};
+
+/**
  * Simulate sending confirmation email to patient
  */
 export async function sendPatientConfirmation(data) {
   const { name, email, doctor, appointmentDate, appointmentId } = data;
+  
+  // Generate a mock confirmation code
+  const confirmationCode = generateConfirmationCode();
   
   console.log("=== MOCK EMAIL SERVICE ===");
   console.log(`TO: ${email}`);
@@ -18,14 +29,18 @@ export async function sendPatientConfirmation(data) {
   console.log(`Doctor: ${doctor}`);
   console.log(`Date and Time: ${new Date(appointmentDate).toLocaleString()}`);
   console.log(`Appointment ID: ${appointmentId}`);
+  console.log(`Confirmation Code: ${confirmationCode}`);
   console.log("========================");
   
   // Simulate network delay
   await new Promise(resolve => setTimeout(resolve, 500));
   
   return {
-    messageId: `mock-${Date.now()}-${Math.random().toString(36).substring(2, 15)}`,
-    mock: true
+    info: {
+      messageId: `mock-${Date.now()}-${Math.random().toString(36).substring(2, 15)}`,
+      mock: true
+    },
+    confirmationCode
   };
 }
 
