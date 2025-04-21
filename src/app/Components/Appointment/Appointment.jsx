@@ -131,20 +131,35 @@ export default function Page() {
     setLoading(true);
     setMessage({ text: '', type: '' });
     
-    // Combine date and time into a single datetime
-    const combinedDateTime = formData.appointmentTime ? 
-      new Date(formData.appointmentTime) : 
-      new Date(`${formData.appointmentDate}T${formData.appointmentTime}`);
+    // Validate that both date and time are selected
+    if (!formData.appointmentDate || !formData.appointmentTime) {
+      setMessage({ text: 'Please select both date and time for your appointment', type: 'error' });
+      setLoading(false);
+      return;
+    }
     
-    // Prepare data for submission
-    const submissionData = {
-      ...formData,
-      appointmentDate: combinedDateTime.toISOString()
-    };
-    
-    delete submissionData.appointmentTime; // Remove the separate time field
-  
     try {
+      // Properly combine date and time
+      // The appointmentTime is already an ISO string from a Date object
+      let appointmentDateTime;
+      if (formData.appointmentTime) {
+        // Use the selected time directly as it's already a full ISO string
+        appointmentDateTime = formData.appointmentTime;
+      } else {
+        // This is a fallback but should not be needed
+        setMessage({ text: 'Please select an appointment time', type: 'error' });
+        setLoading(false);
+        return;
+      }
+      
+      // Prepare data for submission
+      const submissionData = {
+        ...formData,
+        appointmentDate: appointmentDateTime
+      };
+      
+      delete submissionData.appointmentTime; // Remove the separate time field
+    
       const response = await fetch("/api/appointment", {
         method: "POST",
         headers: {
@@ -152,22 +167,23 @@ export default function Page() {
         },
         body: JSON.stringify(submissionData),
       });
-  
+    
       const data = await response.json();
-  
+    
       if (response.ok) {
         let successMessage = "Appointment scheduled successfully!";
         
         // Add information about email status
         if (data.emailSent) {
-          successMessage += " A confirmation has been sent to your email.";
+          successMessage += " A Confirmation Code has been sent to your email.";
         } else {
           successMessage += " However, we couldn't send you an email confirmation at this time.";
         }
         
+        // Show success message and clear the form data
         setMessage({ text: successMessage, type: 'success' });
         
-        // Reset form
+        // Clear the form data
         setFormData({
           name: '',
           email: '',
@@ -179,6 +195,8 @@ export default function Page() {
           medication: '',
           medicationList: ''
         });
+        
+        // Clear available time slots
         setAvailableSlots([]);
       } else {
         setMessage({ text: data.message || 'Failed to schedule appointment', type: 'error' });
